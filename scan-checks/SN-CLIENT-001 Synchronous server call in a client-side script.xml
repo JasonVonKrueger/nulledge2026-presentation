@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>user_experience</category>
+<description>Flags server calls in browser-side scripts that block the browser until the server responds:
+- GlideAjax getXMLWait()
+- g_form.getReference(field) without a callback
+- query() without a callback on a GlideRecord created in the script
+
+Applies to Client Scripts, Catalog Client Scripts, UI Policies, Catalog UI Policies and UI Scripts. For UI Actions with Client set, only getXMLWait() and g_form.getReference() are checked, because the same script may also contain server code where GlideRecord.query() is normal. Service Portal widgets are not checked.
+
+getXML() and getXMLAnswer() without a callback are asynchronous and are not flagged by this rule.</description>
+<documentation_url>/kb_view.do?sys_kb_id=419fef837f7d5418ac14a490817dd5f3</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CLIENT-001: Synchronous server call in a client-side script</name>
+<priority>2</priority>
+<resolution_details>Use an asynchronous call with a callback: GlideAjax getXMLAnswer(callback) or getXML(callback), g_form.getReference(field, callback), or GlideRecord query(callback). Synchronous calls freeze the form, and getXMLWait() is not available in Service Portal.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    var kind = new global.EcsContext(engine.current).clientKind();
+    if (!engine.rootNode || !kind) {
+        return;
+    }
+    var hits = new global.EcsClientScript(new global.EcsAst(engine.rootNode), kind).synchronousCalls();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CLIENT-001',
+        title: 'Synchronous server call in a client-side script',
+        recommendation: 'Use an asynchronous call with a callback: GlideAjax getXMLAnswer(callback) or ' +
+            'getXML(callback), g_form.getReference(field, callback), or GlideRecord query(callback). ' +
+            'Synchronous calls freeze the form, and getXMLWait() is not available in Service Portal.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>getXMLWait(), or getReference() or GlideRecord query() without a callback.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-29 13:34:06</sys_created_on>
+<sys_id>46996c6f0bc7b034df230b1f96c3563a</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SN-CLIENT-001: Synchronous server call in a client-side script</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_46996c6f0bc7b034df230b1f96c3563a</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:27</sys_updated_on>
+</scan_linter_check>
+</unload>

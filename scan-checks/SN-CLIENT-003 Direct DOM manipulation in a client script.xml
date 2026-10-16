@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>user_experience</category>
+<description>Flags direct DOM access in Client Scripts, Catalog Client Scripts, UI Policies and UI Scripts: document.getElement*/querySelector* calls, gel(), $(), $j() and jQuery(), and assignments to innerHTML, outerHTML or style properties. DOM access breaks when the platform UI changes and does not work in Service Portal or Workspace. g_form.getControl() is a supported API and is not reported.
+
+Replaces the legacy check "Y1- Direct DOM Manipulation in Client Scripts" (priority 2), which matched text and also flagged getControl().</description>
+<documentation_url>/kb_view.do?sys_kb_id=335a01b4bda7d9c00da00c62db218300</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CLIENT-003: Direct DOM manipulation in a client script</name>
+<priority>3</priority>
+<resolution_details>Use the g_form, g_user and GlideForm APIs (setValue, setDisplay, setVisible, addDecoration, showFieldMsg and so on) instead of reaching into the page. DOM access breaks when the UI changes and does not work in Service Portal or Workspace.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    if (!engine.rootNode || new global.EcsContext(engine.current).clientKind() !== 'client') {
+        return;
+    }
+    var ast = new global.EcsAst(engine.rootNode);
+    var hits = new global.EcsClientScript(ast, 'client').domManipulation();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CLIENT-003',
+        title: 'Direct DOM manipulation in a client script',
+        recommendation: 'Use the g_form, g_user and GlideForm APIs (setValue, setDisplay, setVisible, addDecoration, showFieldMsg and so on) instead of reaching into the page. DOM access breaks when the UI changes and does not work in Service Portal or Workspace.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>A client script reaches into the page DOM directly.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:53:36</sys_created_on>
+<sys_id>a4296ca72b985ace6883bea57ab4acc1</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-CLIENT-003: Direct DOM manipulation in a client script</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_a4296ca72b985ace6883bea57ab4acc1</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:07:14</sys_updated_on>
+</scan_linter_check>
+</unload>

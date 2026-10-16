@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>manageability</category>
+<description>Flags field values set by assigning to the field property of current or of a GlideRecord variable (current.state = 3) instead of setValue(). setValue() converts the value for the field type and is the documented API. Informational. Server-side scripts only.
+
+Replaces the legacy check "NS: Dot-Walking Instead of getValue/setValue", narrowed to assignments: dot-walked reads are normal and are no longer reported.</description>
+<documentation_url>/kb_view.do?sys_kb_id=a55f804cf86c5f2d3a1358f37dc1f20e</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-GR-007: Field set by direct assignment</name>
+<priority>4</priority>
+<resolution_details>Use setValue(field, value) (or setDisplayValue for display values) instead of assigning to the field property.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    if (!engine.rootNode || new global.EcsContext(engine.current).isClientOnly()) {
+        return;
+    }
+    var ast = new global.EcsAst(engine.rootNode);
+    var hits = new global.EcsGlideRecord(ast).directFieldAssignments();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-GR-007',
+        title: 'Field set by direct assignment',
+        recommendation: 'Use setValue(field, value) (or setDisplayValue for display values) instead of assigning to the field property.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>A field value is set with current.field = value instead of setValue().</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:53:34</sys_created_on>
+<sys_id>86116b11cc0d9abf9963ffbfe4d36a76</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-GR-007: Field set by direct assignment</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_86116b11cc0d9abf9963ffbfe4d36a76</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:07:13</sys_updated_on>
+</scan_linter_check>
+</unload>

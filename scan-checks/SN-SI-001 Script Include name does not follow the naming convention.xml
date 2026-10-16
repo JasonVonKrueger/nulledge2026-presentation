@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_table_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<advanced>true</advanced>
+<category>manageability</category>
+<conditions table="sys_script_include"/>
+<description>Flags Script Includes whose name does not match the regular expression in the system property instance_scan.peer_review.names.script_include (currently ^[A-Z][a-zA-Z0-9]*$ on dev284560). Nothing is reported when the property is empty; an invalid pattern is reported on every Script Include so it gets fixed.
+
+Replaces the legacy check "NS: Check Script Include Name" and reads the same property.</description>
+<documentation_url>/kb_view.do?sys_kb_id=cee24a508b6c032da094f8db6c5d23d4</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-SI-001: Script Include name does not follow the naming convention</name>
+<priority>3</priority>
+<resolution_details>Rename the Script Include (and every reference to it) to match the convention in the system property instance_scan.peer_review.names.script_include.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine, current) {
+    var property = 'instance_scan.peer_review.names.script_include';
+    var pattern = String(gs.getProperty(property, '') || '');
+    if (!pattern) {
+        return;
+    }
+    var context = new global.EcsContext(current);
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-SI-001',
+        title: 'Script Include name does not follow the naming convention',
+        recommendation: 'Rename the Script Include (and every reference to it) to match the convention in the ' +
+            'system property ' + property + '.',
+        current: current
+    });
+    var regex;
+    try {
+        regex = new RegExp(pattern);
+    } catch (e) {
+        report.addRecord('The naming convention in ' + property + ' is not a valid regular expression: ' + pattern);
+        engine.finding.setCurrentSource(current);
+        report.flush();
+        return;
+    }
+    var name = context.value('name');
+    if (regex.test(name)) {
+        return;
+    }
+    report.addRecord('Script Include "' + name + '" does not match the naming convention ' + pattern + ' (' + property + ').');
+    engine.finding.setCurrentSource(current);
+    report.flush();
+})(engine, current);
+]]></script>
+<short_description>A Script Include name does not match the configured naming pattern.</short_description>
+<sys_class_name>scan_table_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:53:39</sys_created_on>
+<sys_id>527f5c9b476ab2c21053bffc070755ec</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SN-SI-001: Script Include name does not follow the naming convention</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_table_check_527f5c9b476ab2c21053bffc070755ec</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:51</sys_updated_on>
+<table>sys_script_include</table>
+<use_manifest>false</use_manifest>
+</scan_table_check>
+</unload>

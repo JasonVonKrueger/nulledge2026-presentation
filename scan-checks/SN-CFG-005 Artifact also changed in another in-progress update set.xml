@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_table_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<advanced>true</advanced>
+<category>manageability</category>
+<conditions table="sys_update_set">state=in progress^EQ<item goto="false" or="false" field="state" endquery="false" value="in progress" operator="=" newquery="false"/>
+<item goto="false" or="false" field="" endquery="true" value="" operator="=" newquery="false"/>
+</conditions>
+<description>Flags in-progress update sets that capture a change (not a delete) to a record that is also captured in another in-progress update set. Two developers are changing the same artifact; whichever update set is committed last silently overwrites the other. The finding is recorded against the update set and lists each shared artifact and the other update sets.
+
+Replaces the legacy check "NS: Artifact Modified in Multiple In-Progress Update Sets".</description>
+<documentation_url>/kb_view.do?sys_kb_id=2800163bbd9965394ac5e43c6389056d</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CFG-005: Artifact also changed in another in-progress update set</name>
+<priority>2</priority>
+<resolution_details>Coordinate with the owner of the other update set: merge the work into one update set, or complete and promote them in a deliberate order. Otherwise whichever is committed last silently overwrites the other.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine, current) {
+    var messages = new global.EcsUpdateSet(current).sharedArtifacts();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CFG-005',
+        title: 'Artifact also changed in another in-progress update set',
+        recommendation: 'Coordinate with the owner of the other update set: merge the work into one update set, or complete and promote them in a deliberate order. Otherwise whichever is committed last silently overwrites the other.',
+        current: current
+    });
+    for (var i = 0; i < messages.length; i++) {
+        report.addRecord(messages[i]);
+    }
+    engine.finding.setCurrentSource(current);
+    report.flush();
+})(engine, current);
+]]></script>
+<short_description>A record in this update set is also in another in-progress update set.</short_description>
+<sys_class_name>scan_table_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:34:58</sys_created_on>
+<sys_id>ee57b32fa91c6995dd16b7f607eb813f</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SN-CFG-005: Artifact also changed in another in-progress update set</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_table_check_ee57b32fa91c6995dd16b7f607eb813f</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:39</sys_updated_on>
+<table>sys_update_set</table>
+<use_manifest>false</use_manifest>
+</scan_table_check>
+</unload>

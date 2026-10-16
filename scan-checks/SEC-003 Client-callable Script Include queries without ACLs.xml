@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>security</category>
+<description>Flags new GlideRecord(...) and new GlideAggregate(...) in Script Includes with "Client callable" set. These classes do not enforce ACLs, and a client-callable Script Include can be called from any browser session (GlideAjax), so a caller may read or change data they are not allowed to. A GlideRecord whose code calls canRead(), canWrite(), canCreate() or canDelete() on the same variable is not reported: access is checked explicitly.
+
+Replaces the legacy check "NS: Use GlideRecordSecure for Client Callable Script Includes".</description>
+<documentation_url>/kb_view.do?sys_kb_id=dda9387601028a534ab55f09716d95fa</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SEC-003: Client-callable Script Include queries without ACLs</name>
+<priority>1</priority>
+<resolution_details>Use GlideRecordSecure in client-callable Script Includes so ACLs are enforced for the calling user. If GlideRecord is required, check access explicitly (canRead/canWrite) before returning or changing data, and validate every sysparm parameter.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    var context = new global.EcsContext(engine.current);
+    if (!engine.rootNode || context.table !== 'sys_script_include' || !context.flag('client_callable')) {
+        return;
+    }
+    var hits = new global.EcsSecurity(new global.EcsAst(engine.rootNode)).aclBypassingRecords();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SEC-003',
+        title: 'Client-callable Script Include queries without ACLs',
+        recommendation: 'Use GlideRecordSecure in client-callable Script Includes so ACLs are enforced for the ' +
+            'calling user. If GlideRecord is required, check access explicitly (canRead/canWrite) before returning ' +
+            'or changing data, and validate every sysparm parameter.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>A client-callable Script Include uses GlideRecord/GlideAggregate (no ACLs).</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:34:57</sys_created_on>
+<sys_id>3e56bd40e61e44634a2ab27baefb3568</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SEC-003: Client-callable Script Include queries without ACLs</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_3e56bd40e61e44634a2ab27baefb3568</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:38</sys_updated_on>
+</scan_linter_check>
+</unload>

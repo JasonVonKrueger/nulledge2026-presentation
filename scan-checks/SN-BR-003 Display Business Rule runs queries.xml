@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>performance</category>
+<description>Flags database queries (new GlideRecord, GlideRecordSecure, GlideAggregate or GlideQuery) in Business Rules whose When is display (stored as before_display). Display rules run every time a form is opened, so their queries add to every form load.
+
+Replaces the legacy check "Y1- Display Business Rules Executing GlideRecord Queries" (priority 2).</description>
+<documentation_url>/kb_view.do?sys_kb_id=f82a3d76f494e665271b413375d96eb3</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-BR-003: Display Business Rule runs queries</name>
+<priority>3</priority>
+<resolution_details>Keep display Business Rules to setting g_scratchpad from data already on current. Move lookups to an asynchronous GlideAjax call made by a client script only when the data is needed, or cache the result.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    var rule = new global.EcsContext(engine.current).businessRule();
+    if (!engine.rootNode || !rule) {
+        return;
+    }
+    var ast = new global.EcsAst(engine.rootNode);
+    var hits = new global.EcsBusinessRule(ast, rule).displayQueries();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-BR-003',
+        title: 'Display Business Rule runs queries',
+        recommendation: 'Keep display Business Rules to setting g_scratchpad from data already on current. Move lookups to an asynchronous GlideAjax call made by a client script only when the data is needed, or cache the result.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>A display Business Rule creates a GlideRecord, GlideAggregate or GlideQuery.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:53:35</sys_created_on>
+<sys_id>680892268dda91b8e31a6a37849f652e</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-BR-003: Display Business Rule runs queries</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_680892268dda91b8e31a6a37849f652e</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:07:13</sys_updated_on>
+</scan_linter_check>
+</unload>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>performance</category>
+<description>Review tier of SN-GR-002. Flags server-side GlideRecord deletes where the check cannot confirm that the query is restricted:
+- conditions built from run-time values (field names or encoded queries in variables)
+- conditions on fields that do not exist on the table, which the platform may ignore
+- empty encoded queries
+- conditions added only on some code paths (inside if, loops, ternaries, catch)
+- get() used before a bulk delete
+- GlideRecords passed to other code before the delete, or not created in the same function
+
+A delete with at least one condition fixed in the source (a literal field name or encoded query) on every path is not flagged; the check does not judge how broad a literal condition is.</description>
+<documentation_url>/kb_view.do?sys_kb_id=1a811e50801e6e340075a8720ef2e89e</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-GR-002-R: GlideRecord delete whose query conditions could not be verified</name>
+<priority>3</priority>
+<resolution_details>Confirm the conditions always restrict the delete: validate run-time values (empty or undefined values and invalid field names may widen the query), avoid adding conditions on only some code paths, and check the affected count before deleting. Mute the finding with a reason once reviewed.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    global.EcsGlideRecord.runBulkCheck(engine, {
+        ruleId: 'SN-GR-002-R',
+        tier: 'review',
+        bulkMethod: 'deleteMultiple',
+        perRecordMethod: 'deleteRecord',
+        title: 'GlideRecord delete whose query conditions could not be verified',
+        recommendation: 'Confirm the conditions always restrict the delete: validate run-time values (empty or ' +
+            'undefined values and invalid field names may widen the query), avoid adding conditions on only some ' +
+            'code paths, and check the affected count before deleting. Mute this finding with a reason once reviewed.'
+    });
+})(engine);
+]]></script>
+<short_description>deleteMultiple() or deleteRecord() in a loop; query restriction unconfirmed.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-29 13:06:01</sys_created_on>
+<sys_id>019801720e384a791309cd577f276435</sys_id>
+<sys_mod_count>3</sys_mod_count>
+<sys_name>SN-GR-002-R: GlideRecord delete whose query conditions could not be verified</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_019801720e384a791309cd577f276435</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:25</sys_updated_on>
+</scan_linter_check>
+</unload>

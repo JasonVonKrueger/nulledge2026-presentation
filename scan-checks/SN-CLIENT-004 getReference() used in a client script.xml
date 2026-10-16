@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>performance</category>
+<description>Flags every g_form.getReference() call in browser scripts. getReference() transfers the whole referenced record to the browser to read what is usually one or two fields; without a callback it is also synchronous (reported by SN-CLIENT-001). Deactivate this check if your standard allows getReference() with a callback.
+
+Replaces the legacy check "NS: Avoid using getReference()".</description>
+<documentation_url>/kb_view.do?sys_kb_id=8988551e932693e159f3154b7dfdd514</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CLIENT-004: getReference() used in a client script</name>
+<priority>3</priority>
+<resolution_details>Use GlideAjax to return only the fields needed, or g_form.getDisplayValue() for a reference's display value. getReference() transfers the whole referenced record.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    var kind = new global.EcsContext(engine.current).clientKind();
+    if (!engine.rootNode || !kind) {
+        return;
+    }
+    var ast = new global.EcsAst(engine.rootNode);
+    var hits = new global.EcsClientScript(ast, kind).getReferenceCalls();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CLIENT-004',
+        title: 'getReference() used in a client script',
+        recommendation: 'Use GlideAjax to return only the fields needed, or g_form.getDisplayValue() for a reference\'s display value. getReference() transfers the whole referenced record.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>g_form.getReference() is used, with or without a callback.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:53:36</sys_created_on>
+<sys_id>bdb76cdb8e4da69c4d1c0ca639548a51</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-CLIENT-004: getReference() used in a client script</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_bdb76cdb8e4da69c4d1c0ca639548a51</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:07:15</sys_updated_on>
+</scan_linter_check>
+</unload>

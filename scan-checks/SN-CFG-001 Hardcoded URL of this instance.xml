@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>manageability</category>
+<description>Flags string literals containing the host of the instance being scanned (from glide.servlet.uri, including custom domains), for example 'https://acme.service-now.com/nav_to.do?uri=...'. After the script moves to another instance or the instance is cloned, the URL still points at the original instance.
+
+Only string literals are checked, so comments and URLs built at run time are not matched. Hosts listed in the system property ecs.cfg.allowed_hosts (comma-separated; default hi.service-now.com) are ignored. This instance's host is read from glide.servlet.uri at scan time, so the same script can be SN-CFG-001 on the instance whose URL it contains and SN-CFG-001-R on every other instance.</description>
+<documentation_url>/kb_view.do?sys_kb_id=0396db18f0c6d9c2178e5dd39b4163be</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CFG-001: Hardcoded URL of this instance</name>
+<priority>2</priority>
+<resolution_details>Build instance URLs at run time with gs.getProperty('glide.servlet.uri') (this instance) or gs.getProperty('instance_name'). For other instances or endpoints, use a Connection &amp; Credential alias, a REST Message endpoint, or a system property set per environment.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    if (!engine.rootNode) {
+        return;
+    }
+    var hits = new global.EcsPortability(new global.EcsAst(engine.rootNode)).instanceUrls();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CFG-001',
+        title: 'Hardcoded URL of this instance',
+        recommendation: 'Build instance URLs at run time with gs.getProperty(\'glide.servlet.uri\') (this ' +
+            'instance) or gs.getProperty(\'instance_name\'). For other instances or endpoints, use a Connection & ' +
+            'Credential alias, a REST Message endpoint, or a system property set per environment.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        if (hits[i].tier === 'own') {
+            report.add(hits[i].node, hits[i].message);
+        }
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>A string literal contains this instance's own host name.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-30 00:55:18</sys_created_on>
+<sys_id>3f5e8803a9b30365987aa07235208458</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-CFG-001: Hardcoded URL of this instance</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_3f5e8803a9b30365987aa07235208458</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:06:55</sys_updated_on>
+</scan_linter_check>
+</unload>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_table_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<advanced>true</advanced>
+<category>manageability</category>
+<conditions table="sys_script_include"/>
+<description>Flags Script Includes whose API name is also used by another active Script Include. Which definition a caller gets is then undefined.
+
+Replaces the legacy check "NS: Duplicate Script Include Name".</description>
+<documentation_url>/kb_view.do?sys_kb_id=5fc4670e8f9b33a0e355d25ac06107db</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-SI-002: Duplicate Script Include API name</name>
+<priority>2</priority>
+<resolution_details>Give each Script Include a unique name. With two active definitions of the same API name, which one callers get is undefined; rename or deactivate one of them.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine, current) {
+    var context = new global.EcsContext(current);
+    var apiName = context.value('api_name');
+    if (!apiName) {
+        return;
+    }
+    var others = [];
+    var other = new GlideRecord('sys_script_include');
+    other.addQuery('api_name', apiName);
+    other.addQuery('active', true);
+    other.addQuery('sys_id', '!=', current.getUniqueValue());
+    other.query();
+    while (other.next()) {
+        others.push('"' + other.getValue('name') + '" (' + other.getUniqueValue() + ')');
+    }
+    if (!others.length) {
+        return;
+    }
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-SI-002',
+        title: 'Duplicate Script Include API name',
+        recommendation: 'Give each Script Include a unique name. With two active definitions of the same API name, ' +
+            'which one callers get is undefined; rename or deactivate one of them.',
+        current: current
+    });
+    report.addRecord('Script Include "' + context.value('name') + '" has the same API name (' + apiName + ') as active ' +
+        'Script Include' + (others.length > 1 ? 's ' : ' ') + others.join(', ') + '.');
+    engine.finding.setCurrentSource(current);
+    report.flush();
+})(engine, current);
+]]></script>
+<short_description>Another active Script Include has the same API name.</short_description>
+<sys_class_name>scan_table_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:53:40</sys_created_on>
+<sys_id>dcda88d07ef444924f542add2ed49a08</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-SI-002: Duplicate Script Include API name</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_table_check_dcda88d07ef444924f542add2ed49a08</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:07:17</sys_updated_on>
+<table>sys_script_include</table>
+<use_manifest>false</use_manifest>
+</scan_table_check>
+</unload>

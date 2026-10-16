@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>performance</category>
+<description>Flags current.update() in Business Rules whose timing makes it unnecessary or harmful, using the rule's configured When value:
+- before: changes to current are saved when the rule finishes, so update() saves the record twice and can run this table's Business Rules again.
+- after: update() saves the record a second time and can run this table's Business Rules again; field changes belong in a before rule.
+- display: update() saves the record every time a form displays it.
+
+Async rules are not flagged here: saving current can be legitimate there. SN-BR-002 covers async rules that can trigger themselves.
+
+Only Business Rules (sys_script) are checked; current.update() in UI Actions, Script Includes and other scripts is not in scope. A preceding current.setWorkflow(false) is noted in the finding but does not suppress it, because the extra save remains.</description>
+<documentation_url>/kb_view.do?sys_kb_id=aea7bebf38fbf79ccc3b41d96a5facc9</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-BR-001: Unnecessary current.update() in a Business Rule</name>
+<priority>2</priority>
+<resolution_details>Remove current.update(). In a before rule, set fields on current and let the save persist them. If the logic must run after the save, move the field changes to a before rule. In a display rule, do not save the record.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    var rule = new global.EcsContext(engine.current).businessRule();
+    if (!engine.rootNode || !rule) {
+        return;
+    }
+    var hits = new global.EcsBusinessRule(new global.EcsAst(engine.rootNode), rule).unnecessaryCurrentUpdates();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-BR-001',
+        title: 'Unnecessary current.update() in a Business Rule',
+        recommendation: 'Remove current.update(). In a before rule, set fields on current and let the save persist ' +
+            'them; if the logic must run after the save, move the field changes to a before rule. In a display rule, ' +
+            'do not save the record.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>current.update() in a before, after or display Business Rule.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-29 13:24:14</sys_created_on>
+<sys_id>aebd4ab5479651301deb8586427b7485</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-BR-001: Unnecessary current.update() in a Business Rule</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_aebd4ab5479651301deb8586427b7485</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:06:53</sys_updated_on>
+</scan_linter_check>
+</unload>

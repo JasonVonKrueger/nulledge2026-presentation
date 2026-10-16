@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>user_experience</category>
+<description>Flags Client Scripts and Catalog Client Scripts of type onChange whose onChange function never reads its isLoading parameter (4th), or never tests its newValue parameter (3rd) for empty (!newValue, or a comparison with ''). Parameters are identified by position, whatever they are named. The platform calls onChange when the form loads and when the field is cleared, not only on real edits.
+
+Replaces the legacy check "NS: onChange Missing isLoading/newValue Check".</description>
+<documentation_url>/kb_view.do?sys_kb_id=439ac8e6670022250db5d236fb874c24</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CLIENT-002: onChange client script without a load/empty guard</name>
+<priority>3</priority>
+<resolution_details>Start the function with the standard guard: if (isLoading || newValue === '') { return; } Without it the script also runs when the form loads and when the field is cleared, which causes unneeded server calls and overwrites values.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    var context = new global.EcsContext(engine.current);
+    if (!engine.rootNode || context.clientKind() !== 'client' || context.value('type') !== 'onChange') {
+        return;
+    }
+    var hits = new global.EcsClientScript(new global.EcsAst(engine.rootNode), 'client').onChangeGuards();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CLIENT-002',
+        title: 'onChange client script without a load/empty guard',
+        recommendation: 'Start the function with the standard guard: if (isLoading || newValue === \'\') { return; } ' +
+            'Without it the script also runs when the form loads and when the field is cleared, which causes ' +
+            'unneeded server calls and overwrites values.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>onChange Client Script with no isLoading check or no empty newValue check.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-30 12:30:28</sys_created_on>
+<sys_id>2586164185f3c05809cff7dba5b406ee</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SN-CLIENT-002: onChange client script without a load/empty guard</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_2586164185f3c05809cff7dba5b406ee</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:36</sys_updated_on>
+</scan_linter_check>
+</unload>

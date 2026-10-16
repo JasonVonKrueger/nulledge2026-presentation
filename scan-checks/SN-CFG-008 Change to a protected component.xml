@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_table_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<advanced>true</advanced>
+<category>manageability</category>
+<conditions table="sys_update_set"/>
+<description>Flags update sets that capture any change, including a delete, to a protected component:
+- a record listed in the ECS Protected Component table (u_ecs_protected_component), matched by sys_id, so any record type works and renames do not matter. A change made by a member of the component's owner group is not reported; with no owner group, every change is reported. The finding names the owner group, the reason and who made the change.
+- a change to the protected-component list itself (rows of u_ecs_protected_component are captured in update sets).
+- during the transition: Business Rules and Script Includes named in the system properties instance_scan.peer_review.critical.business_rules / .script_includes, and changes to those properties.
+
+Replaces the legacy checks "NS: Critical Business Rule Changed" and "NS: Critical Script Include Changed".</description>
+<documentation_url>/kb_view.do?sys_kb_id=210b239643b88a1bdd8fc3bfb55b35c5</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CFG-008: Change to a protected component</name>
+<priority>1</priority>
+<resolution_details>Confirm the change was approved by the component's owner group before the update set is promoted, or have a member of that group make the change. Manage the list in the ECS Protected Component table (role u_ecs_protected_component_user).</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine, current) {
+    var messages = new global.EcsUpdateSet(current).criticalChanges();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CFG-008',
+        title: 'Change to a protected component',
+        recommendation: 'Confirm the change was approved by the component\'s owner group before the update set is promoted, or have a member of that group make the change. Manage the list in the ECS Protected Component table (role u_ecs_protected_component_user).',
+        current: current
+    });
+    for (var i = 0; i < messages.length; i++) {
+        report.addRecord(messages[i]);
+    }
+    engine.finding.setCurrentSource(current);
+    report.flush();
+})(engine, current);
+]]></script>
+<short_description>The update set changes or deletes a protected component, or the list itself.</short_description>
+<sys_class_name>scan_table_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:35:02</sys_created_on>
+<sys_id>600e7ea8be8ba3442667515b56a9197c</sys_id>
+<sys_mod_count>3</sys_mod_count>
+<sys_name>SN-CFG-008: Change to a protected component</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_table_check_600e7ea8be8ba3442667515b56a9197c</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:41</sys_updated_on>
+<table>sys_update_set</table>
+<use_manifest>false</use_manifest>
+</scan_table_check>
+</unload>

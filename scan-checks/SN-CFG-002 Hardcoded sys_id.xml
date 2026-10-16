@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>manageability</category>
+<description>Flags string literals that are 32-character hexadecimal values (sys_ids), in any script. A sys_id ties the script to one specific record: it breaks when that record is not on the target instance or has a different sys_id there, and it hides which record is meant.
+
+Priority 3 (review), not blocking: sys_ids of records delivered in the same update set, or created identically on every instance, are legitimate; the reviewer decides. Replaces the sys_id part of the legacy check "NS: Hardcoded sys_ids, Emails, or Group Names".</description>
+<documentation_url>/kb_view.do?sys_kb_id=7d159bdcd44c01256e1c8f30236e8384</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CFG-002: Hardcoded sys_id</name>
+<priority>3</priority>
+<resolution_details>Look the record up by a stable key (name, number, or a system property holding the sys_id) instead of embedding the sys_id. If the record is delivered with the same update set and the sys_id is stable across instances, mute the finding with a reason.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    if (!engine.rootNode) {
+        return;
+    }
+    var hits = new global.EcsPortability(new global.EcsAst(engine.rootNode)).sysIds();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CFG-002',
+        title: 'Hardcoded sys_id',
+        recommendation: 'Look the record up by a stable key (name, number, or a system property holding the sys_id) instead of embedding the sys_id. If the record is delivered with the same update set and the sys_id is stable across instances, mute this finding with a reason.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>A string literal in a script is a sys_id.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-30 12:30:26</sys_created_on>
+<sys_id>9af9ca3e1dbc00a9b7142c004cedd6d6</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-CFG-002: Hardcoded sys_id</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_9af9ca3e1dbc00a9b7142c004cedd6d6</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:07:01</sys_updated_on>
+</scan_linter_check>
+</unload>

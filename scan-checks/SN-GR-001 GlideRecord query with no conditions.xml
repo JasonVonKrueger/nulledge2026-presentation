@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>performance</category>
+<description>Flags server-side query() calls on a GlideRecord or GlideRecordSecure created in the same function with a literal table name, when no condition (addQuery, addEncodedQuery, addActiveQuery, addInactiveQuery, addNullQuery, addNotNullQuery, addJoinQuery) and no setLimit() or chooseWindow() is applied before the query.
+
+Not flagged: GlideAggregate, get(), tables named at run time, tables listed in the system property ecs.gr.small_tables (comma-separated, empty by default), and queries whose conditions exist but cannot be verified (run-time values, conditions on some code paths only, GlideRecords passed to other code first). An unfiltered query is not always a defect: some tables are small by design, and some jobs legitimately process every record. Client-only scripts are skipped.</description>
+<documentation_url>/kb_view.do?sys_kb_id=f99a5f3a65f52e57598c925daa502822</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-GR-001: GlideRecord query with no conditions</name>
+<priority>3</priority>
+<resolution_details>Add query conditions for the records actually needed. To read one record use get() or setLimit(1); to count use GlideAggregate. If the table is small by design, add it to the system property ecs.gr.small_tables; otherwise mute the finding with a reason.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    if (!engine.rootNode || new global.EcsContext(engine.current).isClientOnly()) {
+        return;
+    }
+    var smallTables = global.EcsConfig.getList('gr.small_tables', []);
+    var hits = new global.EcsGlideRecord(new global.EcsAst(engine.rootNode)).unrestrictedQueries(smallTables);
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-GR-001',
+        title: 'GlideRecord query with no conditions',
+        recommendation: 'Add query conditions for the records actually needed. To read one record use get() or ' +
+            'setLimit(1); to count use GlideAggregate. If the table is small by design, add it to the system ' +
+            'property ecs.gr.small_tables; otherwise mute this finding with a reason.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>query() with no conditions or limit reads every record in the table.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-30 01:04:42</sys_created_on>
+<sys_id>15d79fc9fc274d839ddabdb2c571d8d5</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SN-GR-001: GlideRecord query with no conditions</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_15d79fc9fc274d839ddabdb2c571d8d5</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:29</sys_updated_on>
+</scan_linter_check>
+</unload>

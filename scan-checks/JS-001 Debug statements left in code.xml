@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>manageability</category>
+<description>Flags debug output left in scripts: gs.print(), console.log(), console.debug(), console.trace(), jslog(), alert(), and gs.addInfoMessage() whose literal message starts with debug, test, todo, temp, fixme or xxx. gs.log() is not reported: in global scope it is the standard logging call (use gs.info/gs.debug for new code).
+
+Replaces the legacy check "NS: Debug Statements Left in Code", which matched text (including comments) and also flagged every gs.log().</description>
+<documentation_url>/kb_view.do?sys_kb_id=cf72973b144c752c5cfc38a9abe8db5d</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>JS-001: Debug statements left in code</name>
+<priority>3</priority>
+<resolution_details>Remove debug output before promotion. For diagnostics that should stay, use gs.debug() / gs.info() with a clear source, guarded by a system property where needed.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    if (!engine.rootNode) {
+        return;
+    }
+    var ast = new global.EcsAst(engine.rootNode);
+    var hits = new global.EcsCodeQuality(ast).debugStatements();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'JS-001',
+        title: 'Debug statements left in code',
+        recommendation: 'Remove debug output before promotion. For diagnostics that should stay, use gs.debug() / gs.info() with a clear source, guarded by a system property where needed.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>Debug output in a script: gs.print(), console.log(), jslog(), alert(), etc.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:53:29</sys_created_on>
+<sys_id>d9c36b582a631c6b4836cc283dd1c79e</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>JS-001: Debug statements left in code</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_d9c36b582a631c6b4836cc283dd1c79e</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:42</sys_updated_on>
+</scan_linter_check>
+</unload>

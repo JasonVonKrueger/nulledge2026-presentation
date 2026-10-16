@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_script_only_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>manageability</category>
+<description>This check queries the sysauto_script table for records where active is true but the run_start field is either empty or more than 90 days in the past. Active scheduled jobs that have not executed in months are almost always orphaned: the business process they supported was decommissioned, the developer left the project, or the schedule was misconfigured. Each active scheduled job consumes a scheduler thread evaluation on every cycle, and on busy instances with many jobs, orphaned entries contribute to scheduler queue delays that impact legitimate automation.</description>
+<documentation_url/>
+<finding_type>scan_finding</finding_type>
+<name>Y1- Active Scheduled Jobs That Have Not Run in 90+ Days</name>
+<priority>3</priority>
+<resolution_details>An active scheduled job has not executed in over 90 days or has never executed at all. Active jobs consume scheduler thread evaluations on every cycle regardless of whether they actually run.
+
+How to fix:
+1. Deactivate orphaned jobs: If the job is no longer needed, set active to false. Do not delete it in case the history or script is needed for reference.
+2. Fix the schedule: If the job should be running, check the Run field (frequency), Conditional field, and Run as field. A common misconfiguration is Run as pointing to an inactive user, which silently prevents execution.
+3. Check the script for errors: Open the scheduled job and inspect the script. If previous executions threw errors, the job may have been silently failing and the scheduler stopped retrying.
+4. Audit with the owner: Identify the sys_created_by user and confirm whether the job is still needed. If the creator has left the organization, find the current owner of the business process.
+5. Consolidate: If multiple stale jobs do similar things (e.g., cleanup scripts, notification batches), consider consolidating them into a single well-maintained job.
+6. Add monitoring: For critical scheduled jobs, create an alert or email notification that fires if the job has not run within its expected frequency.</resolution_details>
+<run_condition/>
+<score_max>50</score_max>
+<score_min>0</score_min>
+<score_scale>2</score_scale>
+<script><![CDATA[(function(engine) {
+    var cutoff = new GlideDateTime();
+    cutoff.addDaysLocalTime(-90);
+    var cutoffStr = cutoff.getValue();
+
+    var gr = new GlideRecord('sysauto_script');
+    gr.addQuery('active', true);
+    gr.addNullQuery('run_start');
+    gr.query();
+    var neverRanCount = 0;
+
+    while (gr.next()) {
+        neverRanCount++;
+        if (neverRanCount <= 20) {
+            engine.finding.setCurrentSource(gr);
+            engine.finding.setValue('finding_details',
+                'Scheduled job "' + gr.getValue('name') + '" is active but has never executed (run_start is empty). It may be misconfigured or orphaned. Created by ' + (gr.getValue('sys_created_by') || 'unknown') + ' on ' + (gr.getValue('sys_created_on') || 'unknown') + '.');
+            engine.finding.increment();
+        }
+    }
+
+    var gr2 = new GlideRecord('sysauto_script');
+    gr2.addQuery('active', true);
+    gr2.addNotNullQuery('run_start');
+    gr2.addQuery('run_start', '<', cutoffStr);
+    gr2.query();
+    var staleCount = 0;
+
+    while (gr2.next()) {
+        staleCount++;
+        if (staleCount <= 20) {
+            engine.finding.setCurrentSource(gr2);
+            engine.finding.setValue('finding_details',
+                'Scheduled job "' + gr2.getValue('name') + '" is active but last ran on ' + gr2.getValue('run_start') + ' (over 90 days ago). It may be orphaned or its schedule may be misconfigured. Created by ' + (gr2.getValue('sys_created_by') || 'unknown') + '.');
+            engine.finding.increment();
+        }
+    }
+})(engine);]]></script>
+<short_description>Detects active scheduled script executions that have not run in over 90 days, in</short_description>
+<sys_class_name>scan_script_only_check</sys_class_name>
+<sys_created_by>admin</sys_created_by>
+<sys_created_on>2026-09-06 15:12:29</sys_created_on>
+<sys_id>23718b613043456285f605f98c66ec6d</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_name>Y1- Active Scheduled Jobs That Have Not Run in 90+ Days</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_script_only_check_23718b613043456285f605f98c66ec6d</sys_update_name>
+<sys_updated_by>admin</sys_updated_by>
+<sys_updated_on>2026-09-06 15:12:29</sys_updated_on>
+</scan_script_only_check>
+</unload>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>manageability</category>
+<description>Flags string literals containing email addresses, in any script. Addresses in scripts differ between environments (test instances should not mail real people) and change without a code release. Addresses at example.com/.org/.net are ignored.
+
+Replaces the email part of the legacy check "NS: Hardcoded sys_ids, Emails, or Group Names".</description>
+<documentation_url>/kb_view.do?sys_kb_id=ab537c57771bd6a90a927048a1847746</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CFG-003: Hardcoded email address</name>
+<priority>3</priority>
+<resolution_details>Send to users or groups, or read addresses from a system property or a notification recipient list, so they can differ per environment and change without a code change.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    if (!engine.rootNode) {
+        return;
+    }
+    var hits = new global.EcsPortability(new global.EcsAst(engine.rootNode)).emails();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CFG-003',
+        title: 'Hardcoded email address',
+        recommendation: 'Send to users or groups, or read addresses from a system property or a notification recipient list, so they can differ per environment and change without a code change.'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>A string literal in a script contains an email address.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-30 12:30:27</sys_created_on>
+<sys_id>af5d89f8a963a98fdfa73bf132ad80e0</sys_id>
+<sys_mod_count>1</sys_mod_count>
+<sys_name>SN-CFG-003: Hardcoded email address</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_af5d89f8a963a98fdfa73bf132ad80e0</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:07:02</sys_updated_on>
+</scan_linter_check>
+</unload>

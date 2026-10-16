@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_table_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<advanced>true</advanced>
+<category>upgradability</category>
+<conditions table="sys_update_set"/>
+<description>Flags update sets that capture a change (not a delete) to a record delivered by ServiceNow: the record's package is a plugin (sys_plugins, for example com.snc.incident) or a ServiceNow store application (sys_store_app, for example sn_upgrade_mgmt), and not a scoped x_ application. Changed out-of-box records are skipped by upgrades: they no longer receive fixes and must be reviewed after every upgrade. Records of custom global applications (sys_app, whose package source is a sys_id) are not out-of-box.
+
+Replaces the legacy check "NS: Update Set Overwrites Out-of-Box Records", which treated every package other than global and x_ as out-of-box and so also flagged custom global applications.</description>
+<documentation_url>/kb_view.do?sys_kb_id=2506686f94743898cbf034673d626812</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-CFG-007: Update set changes an out-of-box record</name>
+<priority>1</priority>
+<resolution_details>Avoid changing out-of-box records: extend them (for example a new Business Rule or Script Include) instead. If the change is needed, document it; the record is now skipped by upgrades and must be reviewed after every upgrade.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine, current) {
+    var messages = new global.EcsUpdateSet(current).outOfBoxChanges();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SN-CFG-007',
+        title: 'Update set changes an out-of-box record',
+        recommendation: 'Avoid changing out-of-box records: extend them (for example a new Business Rule or Script Include) instead. If the change is needed, document it; the record is now skipped by upgrades and must be reviewed after every upgrade.',
+        current: current
+    });
+    for (var i = 0; i < messages.length; i++) {
+        report.addRecord(messages[i]);
+    }
+    engine.finding.setCurrentSource(current);
+    report.flush();
+})(engine, current);
+]]></script>
+<short_description>The update set captures a change to a record delivered by a ServiceNow package.</short_description>
+<sys_class_name>scan_table_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:35:01</sys_created_on>
+<sys_id>06e20f8bc4369a80f0f4173d25839161</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SN-CFG-007: Update set changes an out-of-box record</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_table_check_06e20f8bc4369a80f0f4173d25839161</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-06 02:07:07</sys_updated_on>
+<table>sys_update_set</table>
+<use_manifest>false</use_manifest>
+</scan_table_check>
+</unload>

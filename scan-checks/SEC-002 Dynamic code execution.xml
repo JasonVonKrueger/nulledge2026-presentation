@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>security</category>
+<description>Flags code that is built from strings and executed, in any script: eval(), new Function(...), setTimeout/setInterval given a string (or a concatenation containing one), and GlideEvaluator.evaluateString(). Code built from strings can execute attacker-controlled input, cannot be analyzed or debugged, and bypasses review. GlideScopedEvaluator.evaluateScript(), the supported way to run a script stored in a field, is not reported.
+
+Replaces the legacy check "NS: eval() Usage in Scripts", which matched text (including comments).</description>
+<documentation_url>/kb_view.do?sys_kb_id=07db5bb26933471eadddd6acd8182ad8</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SEC-002: Dynamic code execution</name>
+<priority>1</priority>
+<resolution_details>Do not build code from strings. Use JSON.parse() for data, pass functions (not strings) to setTimeout/setInterval, and call the intended function directly. To run a script stored in a field, use GlideScopedEvaluator.evaluateScript().</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    if (!engine.rootNode) {
+        return;
+    }
+    var hits = new global.EcsSecurity(new global.EcsAst(engine.rootNode)).dynamicCode();
+    var report = new global.EcsReport(engine, {
+        ruleId: 'SEC-002',
+        title: 'Dynamic code execution',
+        recommendation: 'Do not build code from strings. Use JSON.parse() for data, pass functions (not strings) ' +
+            'to setTimeout/setInterval, and call the intended function directly. To run a script stored in a ' +
+            'field, use GlideScopedEvaluator.evaluateScript().'
+    });
+    for (var i = 0; i < hits.length; i++) {
+        report.add(hits[i].node, hits[i].message);
+    }
+    report.flush();
+})(engine);
+]]></script>
+<short_description>Strings run as code: eval(), new Function(), string timers, evaluateString().</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-10-05 03:34:56</sys_created_on>
+<sys_id>ac48fc72deb67e5be492315327b1302b</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SEC-002: Dynamic code execution</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_ac48fc72deb67e5be492315327b1302b</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:37</sys_updated_on>
+</scan_linter_check>
+</unload>

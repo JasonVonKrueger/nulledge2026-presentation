@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2026-10-16 01:46:58">
+<scan_linter_check action="INSERT_OR_UPDATE">
+<active>true</active>
+<category>performance</category>
+<description>Flags server-side GlideRecord, GlideRecordSecure and GlideAggregate updates that affect every record in the table: updateMultiple() on a GlideRecord with no conditions, and update() inside while (gr.next()) over a query with no conditions.
+
+Detection: the check parses the script and follows GlideRecord variables within each function in source order. A condition is any addQuery, addEncodedQuery, addActiveQuery, addInactiveQuery, addNullQuery, addNotNullQuery or addJoinQuery call on the same variable before the update. setLimit() is not treated as a condition.
+
+Not flagged here: updates whose conditions exist but cannot be verified (run-time values, invalid fields, conditions on some code paths only, GlideRecords passed in from elsewhere). Those are reported by SN-GR-003-R. current.update() is not in scope (see the Business Rule checks).
+
+Client-only scripts (Client Scripts, Catalog Client Scripts, UI Policies, UI Scripts) are skipped.</description>
+<documentation_url>/kb_view.do?sys_kb_id=6c90d03cce4a1d692573ee2f17e71a02</documentation_url>
+<finding_type>u_ecs_finding</finding_type>
+<name>SN-GR-003: GlideRecord update with no query conditions</name>
+<priority>2</priority>
+<resolution_details>Add query conditions that limit the update to the intended records and test them with a count (GlideAggregate) before updating. If updating every record is intended (for example a one-off data fix), mute the finding with a reason.</resolution_details>
+<run_condition/>
+<score_max>100</score_max>
+<score_min>0</score_min>
+<score_scale>1</score_scale>
+<script><![CDATA[(function(engine) {
+    global.EcsGlideRecord.runBulkCheck(engine, {
+        ruleId: 'SN-GR-003',
+        tier: 'confirmed',
+        bulkMethod: 'updateMultiple',
+        perRecordMethod: 'update',
+        title: 'GlideRecord update with no query conditions',
+        recommendation: 'Add query conditions that limit the update to the intended records, and test them with ' +
+            'a count (GlideAggregate) first. If updating every record really is intended, mute this finding with a reason.'
+    });
+})(engine);
+]]></script>
+<short_description>updateMultiple() or update() in a loop, with no query conditions.</short_description>
+<sys_class_name>scan_linter_check</sys_class_name>
+<sys_created_by>nervoussow</sys_created_by>
+<sys_created_on>2026-09-29 13:17:45</sys_created_on>
+<sys_id>188f49f19f789d28fd4df9211c729c5c</sys_id>
+<sys_mod_count>2</sys_mod_count>
+<sys_name>SN-GR-003: GlideRecord update with no query conditions</sys_name>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>scan_linter_check_188f49f19f789d28fd4df9211c729c5c</sys_update_name>
+<sys_updated_by>nervoussow</sys_updated_by>
+<sys_updated_on>2026-10-15 00:16:26</sys_updated_on>
+</scan_linter_check>
+</unload>
