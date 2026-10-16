@@ -10,4 +10,4 @@ Companion repository for my **nullEDGE 2026** presentation on using ServiceNow *
 
 Built and validated on **Zurich**, in the **global** scope. Install it on a non-production instance first.
 
-> Slides: [link to the deck]
+- Slide deck: [deck/Enterprise Coding Standard.pptx](deck/Enterprise%20Coding%20Standard.pptx)
